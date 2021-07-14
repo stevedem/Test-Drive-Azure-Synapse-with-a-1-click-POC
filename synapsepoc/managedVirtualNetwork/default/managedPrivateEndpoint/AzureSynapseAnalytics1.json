@@ -1,0 +1,7 @@
+{
+	"name": "AzureSynapseAnalytics1",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/e3657645-1d69-433c-bc82-e6265a500d83/resourceGroups/synapse-test-drive/providers/Microsoft.Synapse/workspaces/sdgr34ogc63f64kpocws1",
+		"groupId": "sqlServer"
+	}
+}
