@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "CREATE DATABASE SD\nCOLLATE Latin1_General_100_BIN2_UTF8;\n\nCREATE EXTERNAL DATA SOURCE catfact WITH (\n    LOCATION = 'https://sdgr34ogc63f64kpoc.dfs.core.windows.net/apidata/facts/catfact_*.csv'\n);\nDROP EXTERNAL DATA SOURCE catfact;\nCREATE MASTER KEY;\n\nCREATE DATABASE SCOPED CREDENTIAL WorkspaceIdentity\nWITH IDENTITY = 'Managed Identity';\nGO\nDROP EXTERNAL DATA SOURCE catfact;\nCREATE EXTERNAL DATA SOURCE apidata WITH (\n    LOCATION = 'https://sdgr34ogc63f64kpoc.dfs.core.windows.net/apidata/',\n    CREDENTIAL = WorkspaceIdentity\n);\n\nCREATE EXTERNAL FILE FORMAT CsvWithHeader\nWITH (  \n    FORMAT_TYPE = DELIMITEDTEXT,\n    FORMAT_OPTIONS ( FIELD_TERMINATOR = ',', FIRST_ROW = 2   )\n);\ncreate schema SD;\n\ndrop external table SD.cat_fact;\ncreate external table SD.cat_fact (\n    fact varchar(256),\n    load_date DATETIME2\n) with (\n    data_source=apidata,\n    location='facts/catfact_*.csv',\n    file_format = CsvWithHeader\n);\n\n\nselect top 10 *\nfrom openrowset(\n        bulk 'facts/catfact_*.csv',\n        data_source = 'apidata',\n        format = 'csv',\n        parser_version ='2.0',\n        firstrow = 2\n    ) with (\n        fact varchar(256),\n        load_date timestamp()\n    ) as rows\n\nselect * from SD.cat_fact;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "Built-in",
+				"databaseName": "SD"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

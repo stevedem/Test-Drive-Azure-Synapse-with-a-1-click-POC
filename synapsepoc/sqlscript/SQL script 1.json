@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://sdgr34ogc63f64kpoc.dfs.core.windows.net/apidata/facts/catfact_*',\n        FORMAT = 'CSV',\n        PARSER_VERSION='2.0'\n    ) AS [result]\n",
+			"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://sdgr34ogc63f64kpoc.dfs.core.windows.net/apidata/facts/catfact_*',\n        FORMAT = 'CSV',\n        PARSER_VERSION='2.0',\n        HEADER_ROW=TRUE\n    ) with (\n        fact text(256) collate Latin1_General_BIN2,\n        load_date timestamp()\n    ) AS rows\n",
 			"metadata": {
 				"language": "sql"
 			},
