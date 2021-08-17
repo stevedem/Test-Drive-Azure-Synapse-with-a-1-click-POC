@@ -1,0 +1,32 @@
+{
+	"name": "CatFact",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLS_LS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "facts",
+				"fileSystem": "apidata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "fact",
+				"type": "String"
+			},
+			{
+				"name": "date",
+				"type": "String"
+			}
+		]
+	}
+}
