@@ -9,7 +9,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "@{concat('https://catfact.ninja/fact/q=',linkedService().SrNumber)}",
+			"url": "https://catfact.ninja/fact/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		},
