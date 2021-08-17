@@ -1,11 +1,6 @@
 {
 	"name": "GenericREST",
 	"properties": {
-		"parameters": {
-			"SrNumber": {
-				"type": "String"
-			}
-		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
