@@ -2,7 +2,7 @@
 	"name": "tumbling-window-5m",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "IngestDataAPI",
