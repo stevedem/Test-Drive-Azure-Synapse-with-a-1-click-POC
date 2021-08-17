@@ -1,0 +1,12 @@
+{
+	"name": "DataSourceAPI",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "GenericREST",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
