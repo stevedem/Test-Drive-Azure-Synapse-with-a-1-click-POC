@@ -1,0 +1,11 @@
+{
+	"name": "SDSynapsePBI",
+	"properties": {
+		"annotations": [],
+		"type": "PowerBIWorkspace",
+		"typeProperties": {
+			"workspaceID": "14d937b2-fee2-4ad5-a306-436d9e363325",
+			"tenantID": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+		}
+	}
+}
