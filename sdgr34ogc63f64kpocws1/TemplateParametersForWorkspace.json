@@ -18,7 +18,7 @@
 			"value": "https://sdgr34ogc63f64kpoc.dfs.core.windows.net"
 		},
 		"GenericREST_properties_typeProperties_url": {
-			"value": "https://catfact.ninja/fact"
+			"value": "https://catfact.ninja/fact/"
 		},
 		"HttpServerTripDataLinkedService_properties_typeProperties_url": {
 			"value": "https://raw.githubusercontent.com/Azure/Test-Drive-Azure-Synapse-with-a-1-click-POC/main/tripDataAndFaresCSV/trip-data.csv"
