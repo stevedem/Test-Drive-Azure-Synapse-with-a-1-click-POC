@@ -2,12 +2,12 @@
 	"name": "CreateTablesFromFiles-CLEAN",
 	"properties": {
 		"content": {
-			"query": "-- Create Database -- \nCREATE DATABASE SD\nCOLLATE Latin1_General_100_BIN2_UTF8;\n\n\n-- Create Credential -- \nCREATE DATABASE SCOPED CREDENTIAL WorkspaceIdentity\nWITH IDENTITY = 'Managed Identity';\n\n\n-- Step 1A: Create External File Format (to parse data) --\nCREATE EXTERNAL FILE FORMAT CsvWithHeader\nWITH (  \n    FORMAT_TYPE = DELIMITEDTEXT,\n    FORMAT_OPTIONS ( FIELD_TERMINATOR = ',', STRING_DELIMITER = '\"', FIRST_ROW = 2   )\n);\n\n\n-- Step 1B: Create External Data Source (pointing to flat-files) -- \nCREATE EXTERNAL DATA SOURCE apidata WITH (\n    LOCATION = 'https://sdgr34ogc63f64kpoc.dfs.core.windows.net/apidata/',\n    CREDENTIAL = WorkspaceIdentity\n);\n\n\n-- Step 2: Create External Table (using file format + data source)\ncreate external table SD.cat_fact (\n        [fact] varchar(max),\n        [load_date] DATETIME\n) with (\n    data_source=apidata,\n    location='facts/catfact_*.csv',\n    file_format = CsvWithHeader,\n    reject_value = 10000\n);\n\n\n",
+			"query": "-- Create Database -- \nCREATE DATABASE SD\nCOLLATE Latin1_General_100_BIN2_UTF8;\n\n\n-- Create Credential -- \nCREATE DATABASE SCOPED CREDENTIAL WorkspaceIdentity\nWITH IDENTITY = 'Managed Identity';\n\n\n-- Step 1A: Create External File Format (to parse data) --\nCREATE EXTERNAL FILE FORMAT CsvWithHeader\nWITH (  \n    FORMAT_TYPE = DELIMITEDTEXT,\n    FORMAT_OPTIONS ( FIELD_TERMINATOR = ',', STRING_DELIMITER = '\"', FIRST_ROW = 2   )\n);\n\n\n-- Step 1B: Create External Data Source (pointing to flat-files) -- \nCREATE EXTERNAL DATA SOURCE apidata WITH (\n    LOCATION = 'https://sdgr34ogc63f64kpoc.dfs.core.windows.net/apidata/',\n    CREDENTIAL = WorkspaceIdentity\n);\n\n\n-- Step 2: Create External Table (using file format + data source)\ncreate external table SD.cat_fact (\n        [fact] varchar(max),\n        [load_date] DATETIME\n) with (\n    data_source=apidata,\n    location='facts/catfact_*.csv',\n    file_format = CsvWithHeader,\n    reject_value = 10000\n);\n\n\n-- Check out the data --\nSELECT * FROM SD.cat_fact;\n",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "SD",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
