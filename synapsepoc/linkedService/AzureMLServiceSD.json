@@ -1,0 +1,17 @@
+{
+	"name": "AzureMLServiceSD",
+	"properties": {
+		"annotations": [],
+		"type": "AzureMLService",
+		"typeProperties": {
+			"subscriptionId": "e3657645-1d69-433c-bc82-e6265a500d83",
+			"resourceGroupName": "synapse-test-drive",
+			"mlWorkspaceName": "sd-ml-syn-demo",
+			"authentication": "MSI"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
