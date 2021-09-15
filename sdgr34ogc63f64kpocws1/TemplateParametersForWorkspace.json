@@ -17,6 +17,12 @@
 		"ADLS_LS_properties_typeProperties_url": {
 			"value": "https://sdgr34ogc63f64kpoc.dfs.core.windows.net"
 		},
+		"AzureMLServiceSD_properties_typeProperties_subscriptionId": {
+			"value": "e3657645-1d69-433c-bc82-e6265a500d83"
+		},
+		"AzureMLServiceSD_properties_typeProperties_resourceGroupName": {
+			"value": "synapse-test-drive"
+		},
 		"GenericREST_properties_typeProperties_url": {
 			"value": "https://catfact.ninja/fact/"
 		},
