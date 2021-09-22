@@ -3,10 +3,12 @@
 	"properties": {
 		"parameters": {
 			"keyVaultName": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "kvsdgr34ogc63f64kpoc"
 			},
 			"datalakeAccountName": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "sdgr34ogc63f64kpoc"
 			}
 		},
 		"annotations": [],
