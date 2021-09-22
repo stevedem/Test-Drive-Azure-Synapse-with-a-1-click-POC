@@ -185,6 +185,13 @@
 							}
 						}
 					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "TripFaresDataLakeStorageLinkedService",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "stage/stage"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
