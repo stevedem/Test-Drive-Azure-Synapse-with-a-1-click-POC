@@ -1,0 +1,12 @@
+{
+	"name": "NewsAPI",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "NewsREST",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
