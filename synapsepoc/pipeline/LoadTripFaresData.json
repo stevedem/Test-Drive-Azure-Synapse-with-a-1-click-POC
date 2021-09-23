@@ -32,7 +32,14 @@
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
-					"enableStaging": false
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "ADLS_LS",
+							"type": "LinkedServiceReference"
+						},
+						"path": "stage/stage"
+					}
 				},
 				"inputs": [
 					{
@@ -77,7 +84,14 @@
 						"tableOption": "autoCreate",
 						"disableMetricsCollection": false
 					},
-					"enableStaging": false
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "ADLS_LS",
+							"type": "LinkedServiceReference"
+						},
+						"path": "stage/stage"
+					}
 				},
 				"inputs": [
 					{
