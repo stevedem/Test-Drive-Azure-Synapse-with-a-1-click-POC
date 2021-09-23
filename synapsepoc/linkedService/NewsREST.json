@@ -1,0 +1,16 @@
+{
+	"name": "NewsREST",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://newsapi.org/v2/everything?q=Apple&from=2021-09-23&sortBy=popularity&apiKey=3089f85fda9e42728a5974e89efdf217",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
