@@ -1,5 +1,5 @@
 {
-	"name": "IngestNewsData",
+	"name": "IngestNewsDataToSQL",
 	"properties": {
 		"activities": [
 			{
@@ -22,15 +22,7 @@
 						"requestMethod": "GET"
 					},
 					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
+						"type": "AzureSqlSink"
 					},
 					"enableStaging": false,
 					"translator": {
@@ -93,7 +85,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "NewsCSV",
+						"referenceName": "AzureSQLNews",
 						"type": "DatasetReference"
 					}
 				]
