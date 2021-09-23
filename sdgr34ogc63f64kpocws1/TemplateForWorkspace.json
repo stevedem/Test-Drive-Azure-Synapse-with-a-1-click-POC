@@ -155,7 +155,8 @@
 											"path": "['source']['id']"
 										},
 										"sink": {
-											"name": "id"
+											"name": "id",
+											"type": "String"
 										}
 									},
 									{
@@ -163,7 +164,8 @@
 											"path": "['source']['name']"
 										},
 										"sink": {
-											"name": "name"
+											"name": "name",
+											"type": "String"
 										}
 									},
 									{
@@ -171,7 +173,8 @@
 											"path": "['author']"
 										},
 										"sink": {
-											"name": "author"
+											"name": "author",
+											"type": "String"
 										}
 									},
 									{
@@ -179,7 +182,8 @@
 											"path": "['title']"
 										},
 										"sink": {
-											"name": "title"
+											"name": "title",
+											"type": "String"
 										}
 									},
 									{
@@ -187,7 +191,8 @@
 											"path": "['url']"
 										},
 										"sink": {
-											"name": "url"
+											"name": "url",
+											"type": "String"
 										}
 									},
 									{
@@ -195,7 +200,8 @@
 											"path": "['publishedAt']"
 										},
 										"sink": {
-											"name": "publishedAt"
+											"name": "publishedAt",
+											"type": "DateTime"
 										}
 									}
 								],
