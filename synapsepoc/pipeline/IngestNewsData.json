@@ -38,15 +38,6 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "['source']['id']"
-								},
-								"sink": {
-									"name": "id",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "['source']['name']"
 								},
 								"sink": {
