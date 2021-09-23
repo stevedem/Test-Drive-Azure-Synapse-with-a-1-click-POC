@@ -32,6 +32,9 @@
 		"HttpServerTripFareDataLinkedService_properties_typeProperties_url": {
 			"value": "https://raw.githubusercontent.com/Azure/Test-Drive-Azure-Synapse-with-a-1-click-POC/main/tripDataAndFaresCSV/fares-data.csv"
 		},
+		"NewsREST_properties_typeProperties_url": {
+			"value": "https://newsapi.org/v2/everything?q=Apple&from=2021-09-23&sortBy=popularity&apiKey=3089f85fda9e42728a5974e89efdf217"
+		},
 		"TripFaresDataLakeStorageLinkedService_properties_typeProperties_url": {
 			"value": "@{concat('https://',linkedService().datalakeAccountName,'.dfs.core.windows.net')}"
 		},

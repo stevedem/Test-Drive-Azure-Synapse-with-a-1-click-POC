@@ -43,6 +43,10 @@
 			"type": "string",
 			"defaultValue": "https://raw.githubusercontent.com/Azure/Test-Drive-Azure-Synapse-with-a-1-click-POC/main/tripDataAndFaresCSV/fares-data.csv"
 		},
+		"NewsREST_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://newsapi.org/v2/everything?q=Apple&from=2021-09-23&sortBy=popularity&apiKey=3089f85fda9e42728a5974e89efdf217"
+		},
 		"TripFaresDataLakeStorageLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://',linkedService().datalakeAccountName,'.dfs.core.windows.net')}"
@@ -107,6 +111,125 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/IngestNewsData')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy News API",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "['source']['id']"
+										},
+										"sink": {
+											"name": "id"
+										}
+									},
+									{
+										"source": {
+											"path": "['source']['name']"
+										},
+										"sink": {
+											"name": "name"
+										}
+									},
+									{
+										"source": {
+											"path": "['author']"
+										},
+										"sink": {
+											"name": "author"
+										}
+									},
+									{
+										"source": {
+											"path": "['title']"
+										},
+										"sink": {
+											"name": "title"
+										}
+									},
+									{
+										"source": {
+											"path": "['url']"
+										},
+										"sink": {
+											"name": "url"
+										}
+									},
+									{
+										"source": {
+											"path": "['publishedAt']"
+										},
+										"sink": {
+											"name": "publishedAt"
+										}
+									}
+								],
+								"collectionReference": "$['articles']"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "NewsAPI",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "NewsCSV",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/NewsAPI')]",
+				"[concat(variables('workspaceId'), '/datasets/NewsCSV')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/LoadTripFaresData')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -137,24 +260,19 @@
 								}
 							},
 							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
+								"type": "SqlDWSink",
+								"allowCopyCommand": true,
+								"copyCommandSettings": {},
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
 							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "ADLS_LS",
+									"type": "LinkedServiceReference"
+								},
+								"path": "stage/stage"
 							}
 						},
 						"inputs": [
@@ -166,18 +284,9 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "tripDataSink",
+								"referenceName": "AzureSynapseAnalyticsTable1",
 								"type": "DatasetReference",
-								"parameters": {
-									"datalakeAccountName": {
-										"value": "@pipeline().parameters.datalakeAccountName",
-										"type": "Expression"
-									},
-									"keyVaultName": {
-										"value": "@pipeline().parameters.KeyVaultName",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							}
 						]
 					},
@@ -206,24 +315,19 @@
 								}
 							},
 							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
+								"type": "SqlDWSink",
+								"allowCopyCommand": true,
+								"copyCommandSettings": {},
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
 							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "ADLS_LS",
+									"type": "LinkedServiceReference"
+								},
+								"path": "stage/stage"
 							}
 						},
 						"inputs": [
@@ -235,145 +339,11 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "faresDataSink",
+								"referenceName": "AzureSynapseAnalyticsTable2",
 								"type": "DatasetReference",
-								"parameters": {
-									"keyVaultName": {
-										"value": "@pipeline().parameters.KeyVaultName",
-										"type": "Expression"
-									},
-									"datalakeAccountName": {
-										"value": "@pipeline().parameters.datalakeAccountName",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							}
 						]
-					},
-					{
-						"name": "JoinAndAggregateData",
-						"description": "Reads the raw data from both CSV files inside the ADLS, performs the desired transformations (inner join and aggregation) and writes the transformed data into the synapse SQL pool.",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [
-							{
-								"activity": "Create Schema If Does Not Exists",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:30:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "tripFaresDataLoad",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"TripDataCSV": {
-										"datalakeAccountName": {
-											"value": "@pipeline().parameters.datalakeAccountName",
-											"type": "Expression"
-										},
-										"keyVaultName": {
-											"value": "@pipeline().parameters.KeyVaultName",
-											"type": "Expression"
-										}
-									},
-									"FaresDataCSV": {
-										"keyVaultName": {
-											"value": "@pipeline().parameters.KeyVaultName",
-											"type": "Expression"
-										},
-										"datalakeAccountName": {
-											"value": "@pipeline().parameters.datalakeAccountName",
-											"type": "Expression"
-										}
-									},
-									"sink1": {},
-									"sink2": {}
-								}
-							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "TripFaresDataLakeStorageLinkedService",
-									"type": "LinkedServiceReference"
-								},
-								"folderPath": "stage/stage"
-							},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					},
-					{
-						"name": "Create Schema If Does Not Exists",
-						"description": "Creates the schema inside the SQL dedicated pool. Shema name comes from the pipeline parameter 'SchemaName'.",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "IngestTripDataIntoADLS",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "IngestTripFaresDataIntoADLS",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:05:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlDWSource",
-								"sqlReaderQuery": {
-									"value": "IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '@{pipeline().parameters.SchemaName}')\nBEGIN\nEXEC('CREATE SCHEMA @{pipeline().parameters.SchemaName}')\nselect Count(*) from sys.symmetric_keys;\nEND\nELSE\nBEGIN\n    select Count(*) from sys.symmetric_keys;\nEND",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "azureSynapseAnalyticsSchema",
-								"type": "DatasetReference",
-								"parameters": {
-									"SynapseWorkspaceName": {
-										"value": "@pipeline().parameters.SynapseWorkspaceName",
-										"type": "Expression"
-									},
-									"SQLDedicatedPoolName": {
-										"value": "@pipeline().parameters.SQLDedicatedPoolName",
-										"type": "Expression"
-									},
-									"keyVaultName": {
-										"value": "@pipeline().parameters.KeyVaultName",
-										"type": "Expression"
-									},
-									"SQLLoginUsername": {
-										"value": "@pipeline().parameters.SQLLoginUsername",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
 					}
 				],
 				"policy": {
@@ -381,10 +351,6 @@
 					"cancelAfter": {}
 				},
 				"parameters": {
-					"SchemaName": {
-						"type": "string",
-						"defaultValue": "tripFares"
-					},
 					"SynapseWorkspaceName": {
 						"type": "string",
 						"defaultValue": "sdgr34ogc63f64kpocws1.database.windows.net"
@@ -413,12 +379,10 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/tripsDataSource')]",
-				"[concat(variables('workspaceId'), '/datasets/tripDataSink')]",
+				"[concat(variables('workspaceId'), '/datasets/AzureSynapseAnalyticsTable1')]",
 				"[concat(variables('workspaceId'), '/datasets/faresDataSource')]",
-				"[concat(variables('workspaceId'), '/datasets/faresDataSink')]",
-				"[concat(variables('workspaceId'), '/dataflows/tripFaresDataLoad')]",
-				"[concat(variables('workspaceId'), '/linkedServices/TripFaresDataLakeStorageLinkedService')]",
-				"[concat(variables('workspaceId'), '/datasets/azureSynapseAnalyticsSchema')]"
+				"[concat(variables('workspaceId'), '/datasets/AzureSynapseAnalyticsTable2')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ADLS_LS')]"
 			]
 		},
 		{
@@ -844,6 +808,52 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/GenericREST')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/NewsAPI')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NewsREST",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/NewsREST')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/NewsCSV')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ADLS_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "news",
+						"fileSystem": "apidata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ADLS_LS')]"
 			]
 		},
 		{
@@ -1317,6 +1327,27 @@
 				"type": "HttpServer",
 				"typeProperties": {
 					"url": "[parameters('HttpServerTripFareDataLinkedService_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/NewsREST')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('NewsREST_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
 				},
@@ -1847,13 +1878,11 @@
 						"nodeCount": 10,
 						"cores": 4,
 						"memory": 28
-					},
-					"sessionKeepAliveTimeout": 30
+					}
 				},
 				"cells": [
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"# Predict NYC Taxi Tips using Spark ML and Azure Open Datasets\n",
 							"\n",
@@ -1866,7 +1895,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"import matplotlib.pyplot as plt\n",
 							"\n",
@@ -1889,7 +1917,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Ingest Data¶ \n",
 							"\n",
@@ -1898,7 +1925,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# Import NYC yellow cab data from Azure Open Datasets\n",
 							"from azureml.opendatasets import NycTlcYellow\n",
@@ -1917,7 +1943,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#To make development easier, faster and less expensive downsample for now\n",
 							"sampled_taxi_df = nyc_tlc_df.sample(True, 0.001, seed=1234)"
@@ -1927,7 +1952,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Exploratory Data Analysis\n",
 							"\n",
@@ -1936,7 +1960,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#The charting package needs a Pandas dataframe or numpy array do the conversion\n",
 							"sampled_taxi_pd_df = sampled_taxi_df.toPandas()\n",
@@ -1971,7 +1994,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Data Prep and Featurization\n",
 							"\n",
@@ -1983,7 +2005,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"taxi_df = sampled_taxi_df.select('totalAmount', 'fareAmount', 'tipAmount', 'paymentType', 'rateCodeId', 'passengerCount'\\\n",
 							"                                , 'tripDistance', 'tpepPickupDateTime', 'tpepDropoffDateTime'\\\n",
@@ -2006,7 +2027,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Data Prep and Featurization Part 2\n",
 							"\n",
@@ -2018,7 +2038,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"taxi_featurised_df = taxi_df.select('totalAmount', 'fareAmount', 'tipAmount', 'paymentType', 'passengerCount'\\\n",
 							"                                                , 'tripDistance', 'weekdayString', 'pickupHour','tripTimeSecs','tipped'\\\n",
@@ -2035,7 +2054,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Encoding\n",
 							"\n",
@@ -2049,7 +2067,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# The sample uses an algorithm that only works with numeric features convert them so they can be consumed\n",
 							"sI1 = StringIndexer(inputCol=\"trafficTimeBins\", outputCol=\"trafficTimeBinsIndex\"); \n",
@@ -2065,7 +2082,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Generation of Testing and Training Data Sets\n",
 							"Simple split, 70% for training and 30% for testing the model. Playing with this ratio may result in different models.\n",
@@ -2074,7 +2090,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# Decide on the split between training and testing data from the dataframe \n",
 							"trainingFraction = 0.7\n",
@@ -2089,7 +2104,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Train the Model\n",
 							"\n",
@@ -2098,7 +2112,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"## Create a new LR object for the model\n",
 							"logReg = LogisticRegression(maxIter=10, regParam=0.3, labelCol = 'tipped')\n",
@@ -2126,7 +2139,6 @@
 					},
 					{
 						"cell_type": "markdown",
-						"metadata": {},
 						"source": [
 							"## Evaluate and Visualize\n",
 							"\n",
@@ -2136,7 +2148,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"## Plot the ROC curve, no need for pandas as this uses the modelSummary object\n",
 							"modelSummary = lrModel.stages[-1].summary\n",
